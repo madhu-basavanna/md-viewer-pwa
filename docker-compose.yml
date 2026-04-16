@@ -1,0 +1,14 @@
+services:
+  md-viewer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: md-viewer-pwa
+    restart: unless-stopped
+    ports:
+      - "8080:80"        # change left-side port to whatever you prefer
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
