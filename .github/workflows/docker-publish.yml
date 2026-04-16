@@ -1,9 +1,11 @@
 name: Build & Push Docker Image
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.2.3)'
+        required: true
 
 jobs:
   build-and-push:
