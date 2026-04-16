@@ -1,5 +1,6 @@
 # ── Stage 1: deps ────────────────────────────────────────────────────────────
 FROM node:22-alpine AS deps
+LABEL org.opencontainers.image.source="https://github.com/madhu-basavanna/md-viewer-pwa"
 WORKDIR /app
 
 # Copy only the manifest first so this layer is cached unless deps change
