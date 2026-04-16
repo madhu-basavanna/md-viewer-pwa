@@ -1,14 +1,43 @@
+configs:
+  md-viewer-ts-serve:
+    content: |
+      {"TCP":{"443":{"HTTPS":true}},
+      "Web":{"$${TS_CERT_DOMAIN}:443":
+          {"Handlers":{"/":
+          {"Proxy":"http://127.0.0.1:80"}}}},
+      "AllowFunnel":{"$${TS_CERT_DOMAIN}:443":false}}
+
 services:
+  md-viewer-ts:
+    image: tailscale/tailscale:latest
+    container_name: md-viewer-ts
+    hostname: md-viewer-ngx
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/serve.json
+      - TS_USERSPACE=true
+    configs:
+      - source: md-viewer-ts-serve
+        target: /config/serve.json
+    volumes:
+      - md-viewer-ts-state:/var/lib/tailscale
+    restart: unless-stopped
+
   md-viewer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dockerfile
     container_name: md-viewer-pwa
     restart: unless-stopped
-    ports:
-      - "8080:80"        # change left-side port to whatever you prefer
+    network_mode: service:md-viewer-ts
+    # ports:
+    #   - "8080:80"        # change left-side port to whatever you prefer
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/"]
       interval: 30s
       timeout: 5s
       retries: 3
+
+volumes:
+  md-viewer-ts-state:

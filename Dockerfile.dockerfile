@@ -3,7 +3,7 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 
 # Copy only the manifest first so this layer is cached unless deps change
-COPY package.json package-lock.json ./
+COPY .npmrc package.json package-lock.json ./
 RUN npm ci --frozen-lockfile
 
 # ── Stage 2: builder ─────────────────────────────────────────────────────────
