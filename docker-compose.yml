@@ -11,7 +11,7 @@ services:
   md-viewer-ts:
     image: tailscale/tailscale:latest
     container_name: md-viewer-ts
-    hostname: md-viewer-ngx
+    hostname: md-viewer
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_STATE_DIR=/var/lib/tailscale
@@ -27,12 +27,14 @@ services:
   md-viewer:
     build:
       context: .
-      dockerfile: Dockerfile.dockerfile
+      dockerfile: Dockerfile
     container_name: md-viewer-pwa
     restart: unless-stopped
     network_mode: service:md-viewer-ts
     # ports:
     #   - "8080:80"        # change left-side port to whatever you prefer
+    volumes:
+      - /home/homelab/self-hosted-services/copyparty/data/Notes:/usr/share/nginx/html/files
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/"]
       interval: 30s

@@ -467,6 +467,29 @@ function App() {
     }
   }, [handleFileContent])
 
+  // Load file from ?url= query parameter (for self-hosted /files/ folder)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const fileurl = params.get("url")
+    if (!fileurl) return
+
+    history.replaceState(null, "", window.location.pathname)
+
+    const filename = fileurl.split("/").pop() || "file.md"
+
+    fetch(fileurl)
+      .then((res) => {
+        if (!res.ok) throw new Error(`http ${res.status}`)
+        return res.text()
+      })
+      .then((content) => {
+        handleFileContent(content, filename)
+      })
+      .catch(() => {
+        toast.error(`Failed to load file: ${filename}`)
+      })
+  }, [handleFileContent])
+
   // Watch the active tab's file for external changes (live-reload).
   // Only polls when: tab has a file handle, is not dirty, and is not being edited.
   const handleExternalFileChange = useCallback(
